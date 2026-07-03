@@ -24,22 +24,23 @@ jobs:
         with:
           python-version: '3.10'
 
-      # 3. Install dependencies from requirements.txt
+      # 3. Install dependencies from the repository requirements file
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
+          if [ -f req.txt ]; then pip install -r req.txt; fi
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       # 4. Run your data update script
       - name: Run Update Script
         run: python update.py
 
-      # 5. Commit and push the updated CSV file if changes exist
+      # 5. Commit and push the generated dataset files if changes exist
       - name: Commit and Push Changes
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add data/workflow_metrics.csv
+          git add data/workflow_metrics.csv data/workflow_metrics.xlsx
           
           # Only commit if there are actual changes to prevent workflow errors
           if ! git diff --cached --quiet; then

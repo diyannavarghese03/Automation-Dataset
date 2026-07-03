@@ -1,34 +1,36 @@
-import pandas as pd
-import requests
 import os
-import sys
+from datetime import date, timedelta
+
+import pandas as pd
+
 
 def check_and_update():
-    # Example URL of the raw data source
-    DATA_URL = "https://example.com/api/v1/latest_metrics.csv"
-    LOCAL_PATH = "data/workflow_metrics.csv"
-    
-    # 1. Fetch the remote data
-    response = requests.get(DATA_URL)
-    if response.status_code != 200:
-        print("Failed to fetch data from source site.")
-        sys.exit(0) # Exit peacefully
-        
-    remote_df = pd.read_csv(DATA_URL)
-    
-    # 2. Check if local data exists to compare
-    if os.path.exists(LOCAL_PATH):
-        local_df = pd.read_csv(LOCAL_PATH)
-        
-        # Compare row counts, last dates, or hashes to see if it's truly "new"
-        if len(remote_df) == len(local_df):
-            print("No new data detected on the site. Skipping update.")
-            sys.exit(0) # Stop the workflow early without committing
-            
-    # 3. If data is new or local file doesn't exist, overwrite/append
-    os.makedirs('data', exist_ok=True)
-    remote_df.to_csv(LOCAL_PATH, index=False)
-    print("New data found and updated locally!")
+    data_dir = "data"
+    os.makedirs(data_dir, exist_ok=True)
+
+    csv_path = os.path.join(data_dir, "workflow_metrics.csv")
+    excel_path = os.path.join(data_dir, "workflow_metrics.xlsx")
+
+    start_date = date.today() - timedelta(days=29)
+    rows = []
+
+    for offset in range(30):
+        current_date = start_date + timedelta(days=offset)
+        rows.append(
+            {
+                "Date": current_date.strftime("%Y-%m-%d"),
+                "Total_Tasks": 120 + (offset % 7) * 8,
+                "Failed_Tasks": (offset + 2) % 6,
+                "Avg_Duration_Min": 18 + ((offset * 3) % 9),
+            }
+        )
+
+    df = pd.DataFrame(rows)
+    df.to_csv(csv_path, index=False)
+    df.to_excel(excel_path, index=False, engine="openpyxl")
+
+    print(f"Generated {len(df)} workflow records at {csv_path} and {excel_path}")
+
 
 if __name__ == "__main__":
     check_and_update()
