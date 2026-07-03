@@ -32,7 +32,7 @@ jobs:
 
       # 4. Run your data update script
       - name: Run Update Script
-        run: python update_metrics.py
+        run: python update.py
 
       # 5. Commit and push the updated CSV file if changes exist
       - name: Commit and Push Changes
