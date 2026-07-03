@@ -38,7 +38,7 @@ col2.metric("Year Range", f"{int(df['year'].min())} - {int(df['year'].max())}")
 col3.metric("Highest Revenue", f"${int(df['revenue'].max()):,}")
 
 st.subheader("Latest Records")
-st.dataframe(df.head(20), use_container_width=True)
+st.dataframe(df.head(20), width="stretch")
 
 st.subheader("Revenue by Year")
 revenue_by_year = df.groupby("year")["revenue"].sum().reset_index()
